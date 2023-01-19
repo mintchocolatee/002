@@ -1,0 +1,63 @@
+import java.io.*;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+/**
+ *
+ * @author VJT
+ */
+public class NoJobsPartition {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        int partitionCnt=0,indexPartition,v100s=0,opteron=0,k10=0,titan=0,epyc=0,k40c=0;
+        String[] PartitionArray = new String[6];
+        String PartitionList="";
+        try {            
+            Scanner inputStream = new Scanner(new FileInputStream("D:\\WIX 1002\\Assignment\\extracted_log")); 
+            while(inputStream.hasNextLine()){
+                String input = inputStream.nextLine();
+
+                if (input.contains("Partition")){
+                    indexPartition = input.indexOf("Partition")+10;
+                    switch(input.substring(indexPartition)){
+                        case "gpu-v100s": 
+                            v100s +=1;
+                            break;
+                        case "cpu-opteron":
+                            opteron +=1;
+                            break;
+                        case "gpu-k10":
+                            k10 +=1;
+                            break;
+                        case "gpu-titan":
+                            titan +=1;
+                            break;
+                        case "cpu-epyc":
+                            epyc+=1;
+                            break;
+                        case "gpu-k40c":
+                            k40c +=1;
+                            break;
+                    }                        
+                    //cpu-opteron gpu-k10 gpu-titan cpu-epyc gpu-k40c
+                    if (PartitionList.contains(input.substring(indexPartition))== false)
+                        PartitionList += input.substring(indexPartition)+" ";
+                }
+            }
+            inputStream.close();
+
+            PartitionArray = PartitionList.split(" ");
+            
+            System.out.printf("%-18s%-14s%-14s%-14s%-14s%-14s%-14s\n","Partition List: ",PartitionArray[0],PartitionArray[1],PartitionArray[2],PartitionArray[3],PartitionArray[4],PartitionArray[5]);
+            System.out.printf("%-18s%-14d%-14d%-14d%-14d%-14d%-14d\n","Number of jobs: ",v100s,opteron,k10,titan,epyc,k40c);
+            
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(NoJobsPartition.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+}
