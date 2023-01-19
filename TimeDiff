@@ -1,0 +1,50 @@
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+/**
+ *
+ * @author Acer
+ */
+public class TimeDiff {
+
+    public int diffInMillisec(String start, String stop) throws ParseException {
+        int diff;
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        
+        Date dateStart = sdf.parse(start);
+        Date dateStop = sdf.parse(stop);
+ 
+        diff = (int)(dateStop.getTime() - dateStart.getTime());
+        return diff;
+    }
+    
+    public int finalDiffInMillisec(int sum) {
+        int diffMillisec = sum % 1000;
+        return diffMillisec;
+    }
+    
+    public int finalDiffInSec(int sum) {
+        int diffSec = (sum / 1000)% 60;
+        return diffSec;
+    }
+    
+    public int finalDiffInMin(int sum) {
+        int diffMin = (sum/ (1000 * 60)) % 60;
+        return diffMin;
+    }
+    
+    public int finalDiffInHour(int sum) {
+        int diffHour = (sum/ (1000 * 60 * 60)) % 24;
+        return diffHour;
+    }
+    
+    public int finalDiffInDay(int sum) {
+        int diffDay = sum/ (1000 * 60 * 60 * 24);
+        return diffDay;
+    }
+    
+    public void display(String id, String start, String stop, int day, int hour, int min, int sec, int millisec) {
+        System.out.printf("%-8s%30s%31s%14s%4s%6s%9s",id, start, stop, Integer.toString(day) + "day(s)", Integer.toString(hour) + "h", Integer.toString(min) + "min", Integer.toString(sec) + "." + Integer.toString(millisec)+"s\n");
+    }
+}
