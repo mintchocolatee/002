@@ -33,13 +33,13 @@ public class NoJobCreatedCompleted {
         System.out.printf("%-20s%25s", "Total created jobs", "Total completed jobs\n");
         System.out.printf("%-20d%25d", jobCreatedCnt, jobCompletedCnt);
         System.out.print("\nIDs of created jobs: ");
-        for(String id : jobIdCreated) {
+        jobIdCreated.forEach(id -> {
             System.out.print(id + " ");
-        }
+        });
         System.out.print("\nIDs of completed jobs: ");
-        for(String id : jobIdCompleted) {
+        jobIdCompleted.forEach(id -> {
             System.out.print(id + " ");
-        }
+        });
         System.out.println(" ");    
     }
     
