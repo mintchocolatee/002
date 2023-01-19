@@ -1,0 +1,46 @@
+import java.io.*;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class NoJobCreatedCompleted {
+    public static void main(String[] args) throws ParseException {
+        Scanner userInput = new Scanner(System.in);
+        File file = new File("D:\\WIX 1002\\Assignment\\extracted_log");
+        
+        System.out.print("Enter starting date (yyyy-MM-ddTHH:mm:ss.SSS): ");
+        String startDate = userInput.next();
+        System.out.print("Enter ending date (yyyy-MM-ddTHH:mm:ss.SSS): ");
+        String stopDate = userInput.next(); 
+        
+        Extract ext = new Extract();
+        String[] fileContentLine = ext.fileContent(file);
+        
+        int indexLineStart = ext.indexBefTimeGiven(fileContentLine, startDate) + 1;
+        int indexLineStop = ext.indexAftTimeGiven(fileContentLine, stopDate) - 1;
+
+        String[] newContentLine = new String[indexLineStop - indexLineStart + 1];
+
+        for(int i=indexLineStart, j=0; i<(indexLineStop+1); i++, j++) {
+            newContentLine[j] = fileContentLine[i];
+        }  
+        
+        ArrayList<String> jobIdCreated = ext.jobIdCreated(newContentLine);
+        ArrayList<String> jobIdCompleted = ext.jobIdCompleted(newContentLine);
+        int jobCreatedCnt = jobIdCreated.size();
+        int jobCompletedCnt = jobIdCompleted.size();
+
+        System.out.printf("%-20s%25s", "Total created jobs", "Total completed jobs\n");
+        System.out.printf("%-20d%25d", jobCreatedCnt, jobCompletedCnt);
+        System.out.print("\nIDs of created jobs: ");
+        for(String id : jobIdCreated) {
+            System.out.print(id + " ");
+        }
+        System.out.print("\nIDs of completed jobs: ");
+        for(String id : jobIdCompleted) {
+            System.out.print(id + " ");
+        }
+        System.out.println(" ");    
+    }
+    
+}
