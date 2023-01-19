@@ -1,0 +1,116 @@
+import java.util.ArrayList;
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Scanner;
+
+/**
+ *
+ * @author Heng
+ */
+public class Extract {
+    
+    public String[] fileContent(File file) {
+        String content = "";
+        try {
+            Scanner inputStream = new Scanner(new FileInputStream(file));
+            while(inputStream.hasNextLine()) {
+                content = content.concat(inputStream.nextLine() + "\n");
+            }
+            inputStream.close();
+            } catch(FileNotFoundException e){
+            System.out.println("File was not found.");
+            }
+        String[] fileContent = content.split("\n");
+        return fileContent;
+    }
+    
+    public ArrayList<String> jobIdCreated(String[] fileContent) {
+        ArrayList<String> jobId = new ArrayList<>();
+
+        for(int i=0; i<fileContent.length; i++) {
+            if(fileContent[i].contains("Allocate")) {
+                int index = fileContent[i].indexOf("JobId=")+6;
+                jobId.add(fileContent[i].substring(index,index+5));
+            }     
+        } 
+        return jobId;
+    }
+    
+    public ArrayList<String> jobIdCompleted(String[] fileContent) {
+        ArrayList<String> jobId = new ArrayList<>();
+        
+        for(int i=0; i<fileContent.length; i++) {
+            if(fileContent[i].contains("job_complete") && fileContent[i].contains("done")) {
+                int index = fileContent[i].indexOf("JobId=")+6;
+                jobId.add(fileContent[i].substring(index,index+5));
+            }     
+        }
+        return jobId;
+    }
+    
+    public ArrayList<String> jobIdCreatedCompleted(ArrayList<String> jobIdCreated, ArrayList<String> jobIdCompleted) {
+        ArrayList<String> jobIdFinal = new ArrayList<>();
+        for(String id : jobIdCreated) {
+            for(String id2 : jobIdCompleted) {
+                if(id.equals(id2)) {
+                    jobIdFinal.add(id);
+                }
+            }
+        }
+        return jobIdFinal;
+    }
+    
+    public ArrayList<String> startingTime(String[] fileContent, ArrayList<String> jobId) {
+        ArrayList<String> startTime = new ArrayList<>();
+        
+        for(int i=0; i<jobId.size(); i++) {
+            for (String fileContent1 : fileContent) {
+                if (fileContent1.contains("Allocate") && fileContent1.contains(jobId.get(i))) {
+                    startTime.add(i, fileContent1.substring(1, 24));
+                }  
+            }
+        }
+        return startTime;
+    }
+    
+    public ArrayList<String> endingTime(String[] fileContent, ArrayList<String> jobId) {
+        ArrayList<String> stopTime = new ArrayList<>();
+        
+        for(int i=0; i<jobId.size(); i++) {
+            for (String fileContent1 : fileContent) {
+                if (fileContent1.contains("job_complete") && fileContent1.contains("done") && fileContent1.contains(jobId.get(i))) {
+                    stopTime.add(i, fileContent1.substring(1, 24));
+                }  
+            }
+        }
+        return stopTime;
+    }
+     
+    public int indexBefTimeGiven(String[] fileContent, String dateEntered) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        Date date = sdf.parse(dateEntered);
+        int index = 0;
+        for(int i=0; i<fileContent.length; i++) {
+            if(sdf.parse(fileContent[i].substring(1, 24)).before(date)) {
+                index = i;
+            }
+        }   
+        return index;
+    }
+    
+    public int indexAftTimeGiven(String[] fileContent, String dateEntered) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        Date date = sdf.parse(dateEntered);
+        int index;
+        for(int i=0; i<fileContent.length; i++) {
+            if(sdf.parse(fileContent[i].substring(1, 24)).after(date)) {
+                index = i;
+                return index;
+            }
+        }   
+        return 0;
+    }
+}
+
