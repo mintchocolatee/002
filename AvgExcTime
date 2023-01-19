@@ -1,0 +1,71 @@
+import java.io.*;
+import java.text.ParseException;
+import java.util.ArrayList;
+
+
+/**
+ *
+ * @author Heng
+ */
+public class AvgExecTime {
+    public static void main(String[] args) throws IOException, ParseException {
+        
+        File file = new File("D:\\WIX 1002\\Assignment\\extracted_log");
+        
+        Extract ext = new Extract();
+        
+        String[] fileContent = ext.fileContent(file);
+        ArrayList<String> jobIdCreated = ext.jobIdCreated(fileContent);
+        ArrayList<String> jobIdCompleted = ext.jobIdCompleted(fileContent);
+        ArrayList<String> jobIdFinal = ext.jobIdCreatedCompleted(jobIdCreated, jobIdCompleted);
+        
+        ArrayList<String> startTime = ext.startingTime(fileContent, jobIdFinal);
+        ArrayList<String> stopTime = ext.endingTime(fileContent, jobIdFinal);
+
+        TimeDiff time = new TimeDiff();
+
+        int[] day = new int[jobIdFinal.size()];
+        int[] hour = new int[jobIdFinal.size()];
+        int[] min = new int[jobIdFinal.size()];
+        int[] sec = new int[jobIdFinal.size()];
+        int[] millisec = new int[jobIdFinal.size()];
+        int avg, avgMin, avgSec, avgMillisec;
+        int difference, sum=0;
+
+        for(int i=0; i<jobIdFinal.size(); i++) {
+            difference = time.diffInMillisec(startTime.get(i), stopTime.get(i));
+
+            millisec[i] = time.finalDiffInMillisec(difference);
+            sec[i] = time.finalDiffInSec(difference);
+            min[i] = time.finalDiffInMin(difference);
+            hour[i] = time.finalDiffInHour(difference);
+            day[i] = time.finalDiffInDay(difference);
+
+            sum += difference;
+        }
+
+        BufferedWriter writer = new BufferedWriter(new FileWriter("D:\\WIX 1002\\Assignment\\jobStartStop2.txt"));
+
+        for(int i=0; i<jobIdFinal.size(); i++) {
+            writer.write(jobIdFinal.get(i) + "\t" + startTime.get(i) + "\t" + stopTime.get(i) + "\t" + Integer.toString(day[i]) + "day(s) " + Integer.toString(hour[i]) + "h " + Integer.toString(min[i]) + "min " + Integer.toString(sec[i]) + "." + Integer.toString(millisec[i]) + "s\n");
+
+        }
+        writer.close();
+        System.out.println("Total diff: " + sum);
+        avg = sum/jobIdFinal.size();
+        System.out.println("avg: " + sum);
+        avgMillisec = time.finalDiffInMillisec(avg);
+        avgSec = time.finalDiffInSec(avg);
+        avgMin = time.finalDiffInMin(avg);
+
+
+        System.out.printf("%-8s%30s%31s%33s","Job ID","Job Created Date", "Job Complete Date", "Duration\n");
+        for(int i=0; i<jobIdFinal.size(); i++) {
+            time.display(jobIdFinal.get(i), startTime.get(i), stopTime.get(i), day[i], hour[i], min[i], sec[i], millisec[i]);
+        }
+        System.out.println("\nTotal jobs created and complete: " + jobIdFinal.size());
+        System.out.println("Average Execution Time: " + avgMin + "min " + avgSec + "." + avgMillisec + "s");
+ 
+    }
+    
+}
